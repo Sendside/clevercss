@@ -5,7 +5,7 @@ import re
 OPERATORS = ['+', '-', '*', '/', '%', '(', ')', ';', ',']
 
 # units and conversions
-UNITS = ['em', 'ex', 'px', 'cm', 'mm', 'in', 'pt', 'pc', 'deg', 'rad'
+UNITS = ['em', 'ex', 'rem', 'px', 'cm', 'mm', 'in', 'pt', 'pc', 'deg', 'rad'
           'grad', 'ms', 's', 'Hz', 'kHz', '%']
 CONV = {
     'length': {
@@ -25,7 +25,7 @@ CONV = {
     }
 }
 UNIT_MAPPING = {}
-for measures, units in CONV.iteritems():
+for measures, units in CONV.items():
     UNIT_MAPPING.update(dict((unit, measures) for unit in units))
 
 # color literals
@@ -171,7 +171,7 @@ COLORS = {
     'yellow': '#ffff00',
     'yellowgreen': '#9acd32'
 }
-REV_COLORS = dict((v, k) for k, v in COLORS.iteritems())
+REV_COLORS = dict((v, k) for k, v in COLORS.items())
 
 # partial regular expressions for the expr parser
 r_number = '(?:\s\-)?(?:\d+(?:\.\d+)?|\.\d+)'
@@ -188,6 +188,7 @@ regex = {
     'macros_def': re.compile(r'^def ([a-zA-Z-]+)\s*:\s*$'),
     'macros_call': re.compile(r'^\$([a-zA-Z-]+)'),
     # regular expressions for the expr parser
+    'vendorprefix': re.compile(r'-(?:moz|webkit)-[a-z-]+'),
     'operator': re.compile('|'.join(re.escape(x) for x in OPERATORS)),
     'whitespace': re.compile(r'\s+'),
     'number': re.compile(r_number + '(?![a-zA-Z0-9_])'),
@@ -202,4 +203,14 @@ regex = {
                     r'\{([a-zA-Z_][a-zA-Z0-9_]*)\})'),
     'call': re.compile(r'\.' + r_call)
 }
+
+browser_specific_expansions = {
+    'transition-property': ['moz', 'webkit'],
+    'transition-duration': ['moz', 'webkit'],
+    'transition-timing-function': ['moz', 'webkit'],
+    'transition-delay': ['moz', 'webkit'],
+
+    'box-sizing': ['moz', 'webkit'],
+}
+
 # vim: et sw=4 sts=4

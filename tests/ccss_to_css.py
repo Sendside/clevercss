@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
+import os
+import sys
 import unittest
-from magictest import MagicTest as TestCase
+from tests.magictest import MagicTest as TestCase
 
 from textwrap import dedent
 
@@ -9,20 +11,20 @@ import clevercss
 from clevercss import convert
 from clevercss.line_iterator import LineIterator
 
+from clevercss.errors import *
+
 def eigen_test():
-    import re
-    rx = re.compile(r'Example::\n(.*?)__END__(?ms)')
-    text = rx.search(clevercss.__doc__).group(1)
-    ccss = '\n'.join(line[8:].rstrip() for line in text.splitlines())
+    filename = os.path.join(os.path.dirname(__file__), 'eigentest.ccss')
+    ccss = open(filename).read()
     return clevercss.convert(ccss)
 
 class ConvertTestCase(TestCase):
     def convert(self):
-        self.assertEqual(convert('''body: 
-            color: $color 
+        self.assertEqual(convert('''body:
+            color: $color
         ''',{'color':'#eee'}),
         u'body {\n  color: #eeeeee;\n}')
-    
+
     def convert2(self):
         self.assertEqual(convert('''body:
             background-color: $background_color
@@ -63,6 +65,12 @@ class ConvertTestCase(TestCase):
         }""").strip())
 
     def test_eigen(self):
+        if sys.version_info >= (3, 0):
+            # round() behavior changed in Python 3
+            # http://docs.python.org/3/whatsnew/3.0.html#builtins
+            a_hover_color = '#4c0000'
+        else:
+            a_hover_color = '#4d0000'
         self.assertEqual(eigen_test(),dedent("""
         body {
           font-family: serif, sans-serif, Verdana, 'Times New Roman';
@@ -84,7 +92,7 @@ class ConvertTestCase(TestCase):
         }
 
         a:hover {
-          color: #4d0000;
+          color: %(a_hover_color)s;
         }
 
         a:active {
@@ -113,7 +121,7 @@ class ConvertTestCase(TestCase):
           height: 1em;
           padding: 0.1em;
         }
-        """).strip())
+        """ % {'a_hover_color': a_hover_color}).strip())
 
     def test_import_line(self):
       """
@@ -123,7 +131,7 @@ class ConvertTestCase(TestCase):
       """
       self.assertEqual(convert(dedent("""
       @import url(tests/example.ccss)
-      
+
       div:
           color: $arg
       """)), dedent("""
@@ -138,11 +146,11 @@ class ConvertTestCase(TestCase):
       #test3 {
         color: blue;
       }
-      
+
       div {
         color: blue;
       }""").strip())
-      
+
 
     def test_multiline_rule(self):
         self.assertEqual(convert(dedent("""
@@ -192,21 +200,31 @@ class MacroTestCase(TestCase):
         }''')
         self.assertEqual(convert(ccss), css)
 
+    def test_undefined_macro(self):
+        ccss = dedent('''
+        body:
+            $simple
+            width:200px
+        .other:
+            $simple
+        ''')
+        self.assertRaises(ParserError, convert, ccss)
+
 class LineIterTestCase(TestCase):
     def test_comments(self):
         line_iter = LineIterator(dedent(
         """
         /* block */
-        /* multiblock 
+        /* multiblock
         */
-                
-        aa, /* comment */bb: 
+
+        aa, /* comment */bb:
             x:1 // comment
-            
+
         """))
         self.assertEqual("\n".join([s[1] for s in line_iter]),
             "aa, bb:\n    x:1")
-    
+
 
 def all_tests():
     return unittest.TestSuite(case.toSuite() for case in [ConvertTestCase, LineIterTestCase, MacroTestCase])

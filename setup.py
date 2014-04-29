@@ -19,9 +19,10 @@ setup(
     maintainer_email='david.ziegler@gmail.com',
     version='0.2.2.dev',
     url='http://sandbox.pocoo.org/clevercss/',
-    download_url='https://github.com/guileen/clevercss3/tree',
     py_modules=['extract_sprites'],
+    download_url='http://github.com/dziegler/clevercss/tree',
     packages=['clevercss'],
+    scripts=['bin/ccss'],
     description='python inspired sass-like css preprocessor',
     long_description=readme_text,
     install_requires = req_modules,
@@ -30,7 +31,12 @@ setup(
     },
     classifiers=[
         'License :: OSI Approved :: BSD License',
-        'Programming Language :: Python'
+        'Programming Language :: Python',
+        'Environment :: Web Environment',
+        'Intended Audience :: Developers',
+        'Operating System :: OS Independent',
+        'Topic :: Internet :: WWW/HTTP',
+        'Topic :: Utilities'
     ],
     test_suite = 'tests.all_tests',
 )

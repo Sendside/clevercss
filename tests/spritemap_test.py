@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import unittest
-from magictest import MagicTest as TestCase
+from tests.magictest import MagicTest as TestCase
 
 from textwrap import dedent
 
@@ -15,14 +15,14 @@ class SpriteMapTestCase(TestCase):
             correct)
 
 correct = '''body {
-  background-image: url('big.png') -0px -0px;
+  background-image: url(big.png) -0px -0px;
   width: 20px;
   height: 20px;
 }
 
 body div.other,
 body .some {
-  background-image: url('big.png') -0px -20px;
+  background-image: url(big.png) -0px -20px;
 }'''
 def all_tests():
     return unittest.TestSuite(case.toSuite() for case in [SpriteMapTestCase])
