@@ -18,6 +18,7 @@ from clevercss import line_iterator
 import os
 from clevercss.errors import *
 
+
 class Engine(object):
     """
     The central object that brings parser and evaluation together.  Usually
@@ -46,8 +47,9 @@ class Engine(object):
 
         # pull in imports
         for fname, source in self._imports.items():
-          for media, selectors, defs in Engine(source[1], fname=fname).evaluate(context):
-            yield media, selectors, defs
+            for media, selectors, defs in Engine(source[1], fname=fname)\
+                    .evaluate(context):
+                yield media, selectors, defs
 
         for media, selectors, defs in self.rules:
             all_defs = []
@@ -59,7 +61,8 @@ class Engine(object):
                     all_defs.append((key, string_expr))
                 else:
                     for prefix in prefixes:
-                        all_defs.append(('-%s-%s' % (prefix, key), string_expr))
+                        all_defs.append(('-%s-%s' % (prefix, key),
+                                         string_expr))
             yield media, selectors, all_defs
 
     def to_css(self, context=None):
@@ -125,12 +128,14 @@ class Engine(object):
 
         return '\n'.join(lines)
 
+
 class TokenStream(object):
     """
     This is used by the expression parser to manage the tokens.
     """
 
     def __init__(self, lineno, gen):
+        self.current = None
         self.lineno = lineno
         self.gen = gen
         next(self)
@@ -147,6 +152,7 @@ class TokenStream(object):
             raise ParserError(self.lineno, "expected '%s', got '%s'." %
                               (value, self.current[0]))
         next(self)
+
 
 class Parser(object):
     """
@@ -322,7 +328,9 @@ class Parser(object):
         """
         Create a flat structure and parse inline expressions.
         """
-        expand_def = lambda lineno_k_v: (lineno_k_v[1], self.parse_expr(lineno_k_v[0], lineno_k_v[2]))
+        expand_def = lambda lineno_k_v: (lineno_k_v[1],
+                                         self.parse_expr(lineno_k_v[0],
+                                                         lineno_k_v[2]))
         expand_defs = lambda it: list(map(expand_def, it))
 
         def handle_rule(rule, children, defs, macroses):
@@ -333,7 +341,9 @@ class Parser(object):
                         if k == '__macros_call__':
                             macros_defs = macroses.get(v, None)
                             if macros_defs is None:
-                                raise ParserError(lineno, 'No macro with name "%s" is defined' % v)
+                                raise ParserError(lineno,
+                                                  'No macro with name "%s" '
+                                                  'is defined' % v)
                             styles.extend(expand_defs(macros_defs))
                         else:
                             styles.append(expand_def((lineno, k, v)))
@@ -437,7 +447,8 @@ class Parser(object):
                      (consts.regex['spritemap'], process('spritemap', 1)),
                      (consts.regex['backstring'], process('backstring', 1)),
                      (consts.regex['string'], process_string),
-                     (consts.regex['var'], lambda m: (m.group(1) or m.group(2), 'var')),
+                     (consts.regex['var'], lambda m: (m.group(1) or
+                                                      m.group(2), 'var')),
                      (consts.regex['whitespace'], None))
 
             while pos < end:

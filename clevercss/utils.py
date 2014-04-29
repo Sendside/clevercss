@@ -2,6 +2,7 @@
 
 import colorsys
 
+
 def number_repr(value, context):
     """
     CleverCSS uses floats internally.  To keep the string representation
@@ -44,8 +45,9 @@ def hsv_to_rgb(hue, saturation, value):
     """Converts Hue/Saturation/Value back to RGB."""
     rgbtup = colorsys.hsv_to_rgb(hue, saturation, value)
     red = int(round(rgbtup[0] * 255, 0))
-    green = int(round(rgbtup[1]* 255, 0))
-    blue = int(round(rgbtup[2]* 255, 0))
-    return (red, green, blue)
+    green = int(round(rgbtup[1] * 255, 0))
+    blue = int(round(rgbtup[2] * 255, 0))
+    return red, green, blue
+
 
 # vim: et sw=4 sts=4

@@ -32,7 +32,8 @@ def main():
             help='evaluate the example from the docstring')
     parser.add_option('--list-colors', action='store_true',
             help='list all known color names')
-    parser.add_option('-n', '--no-overwrite', action='store_true', dest='no_overwrite',
+    parser.add_option('-n', '--no-overwrite', action='store_true',
+            dest='no_overwrite',
             help='don\'t overwrite any files (default=false)')
     parser.add_option('--to-ccss', action='store_true',
             help='convert css files to ccss')
@@ -76,7 +77,9 @@ def parseCSS(text):
 def rulesToCCSS(selector, rules):
     text = selector + ':\n '
     if rules.get(':rules:'):
-        text += '\n\n '.join('\n '.join(line.strip().rstrip(';') for line in rule.style.cssText.splitlines()) for rule in rules.get(':rules:', [])) + '\n'
+        text += '\n\n '.join('\n '.join(line.strip().rstrip(';')
+                for line in rule.style.cssText.splitlines())
+                for rule in rules.get(':rules:', [])) + '\n'
     for other in rules:
         if other == ':rules:':
             continue
@@ -117,7 +120,8 @@ def convert_many(files, options):
                              'source and target file "%s".' % fname)
             sys.exit(2)
         elif options.no_overwrite and os.path.exists(target):
-            sys.stderr.write('File exists (and --no-overwrite was used) "%s".' % target)
+            sys.stderr.write('File exists (and --no-overwrite was used) '
+                             '"%s".' % target)
             sys.exit(3)
 
         src = open(fname)

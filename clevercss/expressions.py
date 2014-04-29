@@ -7,6 +7,7 @@ import operator
 from clevercss import consts
 from clevercss.errors import *
 
+
 class Expr(object):
     """
     Baseclass for all expressions.
@@ -88,6 +89,7 @@ class ImplicitConcat(Expr):
     def to_string(self, context):
         return u' '.join(x.to_string(context) for x in self.nodes)
 
+
 class Bin(Expr):
 
     def __init__(self, left, right, lineno=None):
@@ -95,11 +97,13 @@ class Bin(Expr):
         self.left = left
         self.right = right
 
+
 class Add(Bin):
 
     def evaluate(self, context):
         return self.left.evaluate(context).add(
                self.right.evaluate(context), context)
+
 
 class Sub(Bin):
 
@@ -107,11 +111,13 @@ class Sub(Bin):
         return self.left.evaluate(context).sub(
                self.right.evaluate(context), context)
 
+
 class Mul(Bin):
 
     def evaluate(self, context):
         return self.left.evaluate(context).mul(
                self.right.evaluate(context), context)
+
 
 class Div(Bin):
 
@@ -119,11 +125,13 @@ class Div(Bin):
         return self.left.evaluate(context).div(
                self.right.evaluate(context), context)
 
+
 class Mod(Bin):
 
     def evaluate(self, context):
         return self.left.evaluate(context).mod(
                self.right.evaluate(context), context)
+
 
 class Neg(Expr):
 
@@ -133,6 +141,7 @@ class Neg(Expr):
 
     def evaluate(self, context):
         return self.node.evaluate(context).neg(context)
+
 
 class Call(Expr):
 
@@ -148,6 +157,7 @@ class Call(Expr):
                                             for x in self.args],
                               context)
 
+
 class Literal(Expr):
 
     def __init__(self, value, lineno=None):
@@ -162,6 +172,7 @@ class Literal(Expr):
                                .replace('\t', '\\\t') \
                                .replace('\'', '\\\'')
         return rv
+
 
 class Number(Literal):
     name = 'number'
@@ -225,6 +236,7 @@ class Number(Literal):
 
     def to_string(self, context):
         return utils.number_repr(self.value, context)
+
 
 class Value(Literal):
     name = 'value'
@@ -301,6 +313,7 @@ class Value(Literal):
     def to_string(self, context):
         return utils.number_repr(self.value, context) + self.unit
 
+
 class Color(Literal):
     name = 'color'
 
@@ -314,8 +327,8 @@ class Color(Literal):
                     return self
                 lightness *= 1.0 + amount.value / 100.0
             else:
-                raise errors.EvalException(self.lineno, 'invalid unit %s for color '
-                                    'calculations.' % amount.unit)
+                raise errors.EvalException(self.lineno, 'invalid unit %s '
+                        'for color calculations.' % amount.unit)
         elif isinstance(amount, Number):
             lightness += (amount.value / 100.0)
         if lightness > 1:
@@ -332,8 +345,8 @@ class Color(Literal):
                     return self
                 lightness *= amount.value / 100.0
             else:
-                raise errors.EvalException(self.lineno, 'invalid unit %s for color '
-                                    'calculations.' % amount.unit)
+                raise errors.EvalException(self.lineno, 'invalid unit %s '
+                        'for color calculations.' % amount.unit)
         elif isinstance(amount, Number):
             lightness -= (amount.value / 100.0)
         if lightness < 0:
@@ -438,7 +451,6 @@ class Color(Literal):
 
         return Color(utils.hsv_to_rgb(hue, snew, lnew))
 
-
     def mix(self, context, values=None):
         """
         For design purposes, related colours that share the same hue are created
@@ -472,11 +484,11 @@ class Color(Literal):
             for val in values:
                 items.append(val)
         except TypeError:
-            raise IndexError("Two arguments are required to mix: a (second) "\
+            raise IndexError("Two arguments are required to mix: a (second) "
                             "color and a percentage")
 
         if len(items) != 2:
-            raise IndexError("Exactly two arguments are required to mix: "\
+            raise IndexError("Exactly two arguments are required to mix: "
                             "a (second) color and a percentage")
         else:
             amount = abs(items[0].value)
@@ -582,6 +594,7 @@ class Color(Literal):
             channels.append(new_val)
         return Color(tuple(channels), lineno=self.lineno)
 
+
 class RGB(Expr):
     """
     an expression that hopefully returns a Color object.
@@ -608,6 +621,7 @@ class RGB(Expr):
                                 'the range 0 to 255.')
             args.append(value)
         return Color(args, lineno=self.lineno)
+
 
 class RGBA(RGB):
     """
@@ -638,6 +652,7 @@ class RGBA(RGB):
             args.append(value)
         return 'rgba(%s)' % (', '.join(str(n) for n in args))
 
+
 class Backstring(Literal):
     """
     A string meant to be escaped directly to output.
@@ -650,6 +665,7 @@ class Backstring(Literal):
 
     def to_string(self, context):
         return str(self.nodes)
+
 
 class String(Literal):
     name = 'string'
@@ -669,6 +685,7 @@ class String(Literal):
             return String(self.value * int(other.value), lineno=self.lineno)
         return Literal.mul(self, other, context, lineno=self.lineno)
 
+
 class URL(Literal):
     name = 'URL'
     methods = {
@@ -686,6 +703,7 @@ class URL(Literal):
 
     def to_string(self, context):
         return 'url(%s)' % Literal.to_string(self, context)
+
 
 class SpriteMap(Expr):
     name = 'SpriteMap'
@@ -769,6 +787,7 @@ class SpriteMap(Expr):
     def annotate_used(self, sprite):
         pass
 
+
 class AnnotatingSpriteMap(SpriteMap):
     sprite_maps = []
 
@@ -794,6 +813,7 @@ class AnnotatingSpriteMap(SpriteMap):
     def all_used_sprites(cls):
         for smap in cls.sprite_maps:
             yield smap, list(smap._sprites_used.values())
+
 
 class Sprite(Expr):
     name = 'Sprite'
@@ -825,14 +845,18 @@ class Sprite(Expr):
 
     def _get_coords(self):
         return self.x1, self.y1, self.x2, self.y2
+
     def _set_coords(self, value):
         self.x1, self.y1, self.x2, self.y2 = value
     coords = property(_get_coords, _set_coords)
 
     @property
-    def width(self): return self.x2 - self.x1
+    def width(self):
+        return self.x2 - self.x1
+
     @property
-    def height(self): return self.y2 - self.y1
+    def height(self):
+        return self.y2 - self.y1
 
     def _pos_vals(self, context):
         """Get a list of position values."""
@@ -843,6 +867,7 @@ class Sprite(Expr):
     def to_string(self, context):
         sprite_url = self.spritemap.get_sprite_url(self)
         return "url(%s) -%dpx -%dpx" % (sprite_url, self.x1, self.y1)
+
 
 class Var(Expr):
 
@@ -861,6 +886,7 @@ class Var(Expr):
         finally:
             context[self.name] = val
 
+
 class FailingVar(Expr):
 
     def __init__(self, var, lineno=None):
@@ -870,6 +896,7 @@ class FailingVar(Expr):
     def evaluate(self, context):
         raise EvalException(self.lineno, 'Circular variable dependencies '
                             'detected when resolving %s.' % (self.var.name,))
+
 
 class List(Expr):
     name = 'list'
