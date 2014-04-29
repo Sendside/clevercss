@@ -78,6 +78,8 @@ class Engine(object):
                 if current_media:
                     block.append('}\n\n')
                 if media:
+                    # The media statement itself may contain expressions.
+                    media = Parser().parse_expr(0, media).to_string(context)
                     block.append('@media %s {\n' % media)
                 current_media = media
             block.append(indent + u',\n'.join(selectors) + ' {')
@@ -98,6 +100,8 @@ class Engine(object):
                 if current_media:
                     parts.append('}')
                 if media:
+                    # The media statement itself may contain expressions.
+                    media = Parser().parse_expr(0, media).to_string(context)
                     parts.append('@media %s{' % media)
                 current_media = media
             parts.append(u''.join(u'%s{%s}' % (
